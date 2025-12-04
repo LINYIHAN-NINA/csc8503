@@ -1,119 +1,154 @@
-set(PROJECT_NAME CSC8503)
+set(PROJECT_NAME CSC8503CoreClasses)
 
 ################################################################################
 # Source groups
 ################################################################################
-#set(Header_Files
-#    "GameTechRenderer.h"
-#    "NetworkedGame.h"
-#    "NetworkPlayer.h"
-#    "StateGameObject.h"
-#    "TutorialGame.h"
-#)
-file(GLOB Header_Files *.h)
-list(APPEND Header_Files
-    ${CMAKE_CURRENT_SOURCE_DIR}/HighScoreTable.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/ScoreboardManager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/MenuState.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/MainMenuState.h
+set(AI_Behaviour_Tree
+    "BehaviourAction.h"
+    "BehaviourNode.h"
+    "BehaviourNodeWithChildren.h"
+    "BehaviourSelector.h"
+    "BehaviourSelector.cpp"
+    "BehaviourSequence.h"
+    "BehaviourSequence.cpp"
+)
+source_group("AI\\Behaviour Trees" FILES ${AI_Behaviour_Tree})
+
+set(AI_Pushdown_Automata
+    "PushdownMachine.h"
+    "PushdownMachine.cpp"
+    "PushdownState.h"
+    "PushdownState.cpp"
+)
+source_group("AI\\Pushdown Automata" FILES ${AI_Pushdown_Automata})
+
+set(AI_State_Machine
+    "State.h"
+    "StateMachine.h"  
+    "StateMachine.cpp"
+    "StateMachine.h"
+    "StateTransition.h"
+)
+source_group("AI\\State Machine" FILES ${AI_State_Machine})
+
+set(AI_Pathfinding
+    "NavigationGrid.h"
+    "NavigationGrid.cpp"  
+    "NavigationMesh.cpp"
+    "NavigationMesh.h"
+    "NavigationMap.h"
+    "NavigationPath.h"
+)
+source_group("AI\\Pathfinding" FILES ${AI_Pathfinding})
+
+
+set(Collision_Detection
+    "AABBVolume.h"
+    "CapsuleVolume.h"  
+    "CapsuleVolume.cpp"
+    "CollisionDetection.h"
+    "CollisionDetection.cpp"
+     "CollisionVolume.h"
+    "OBBVolume.h"
+    "QuadTree.h"
+    "QuadTree.cpp"
+    "Ray.h"
+    "SphereVolume.h"
+)
+source_group("Collision Detection" FILES ${Collision_Detection})
+
+set(Networking
+    "GameClient.h"  
+    "GameClient.cpp"
+    "GameServer.h"
+    "GameServer.cpp"
+    "NetworkBase.h"
+    "NetworkBase.cpp"
+    "NetworkObject.h"
+    "NetworkObject.cpp"
+    "NetworkState.h"
+    "NetworkState.cpp"
+)
+source_group("Networking" FILES ${Networking})
+
+set(Physics
+    "constraint.h"  
+     "constraint.h"  
+    "PositionConstraint.cpp"
+    "PositionConstraint.h"
+    "OrientationConstraint.cpp"
+    "OrientationConstraint.h"
+    "PhysicsObject.cpp"
+    "PhysicsObject.h"
+    "PhysicsSystem.cpp"
+    "PhysicsSystem.h"
+)
+source_group("Physics" FILES ${Physics})
+
+set(Header_Files
+    "Debug.h"
+    "GameObject.h"
+    "GameWorld.h"
+    "RenderObject.h"
+    "Transform.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
-
-
-#set(Source_Files
-#    "GameTechRenderer.cpp"
-#    "Main.cpp"
-#    "NetworkedGame.cpp"
-#    "NetworkPlayer.cpp"
-#    "StateGameObject.cpp"
-#    "TutorialGame.cpp"
-#)
-file(GLOB Source_Files *.cpp)
-list(APPEND Source_Files
-    ${CMAKE_CURRENT_SOURCE_DIR}/HighScoreTable.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ScoreboardManager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/MenuState.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/MainMenuState.cpp
+set(Source_Files
+    "Debug.cpp"
+    "GameObject.cpp"
+    "GameWorld.cpp"
+    "RenderObject.cpp"
+    "Transform.cpp"
 )
-list(REMOVE_DUPLICATES Header_Files)
-list(REMOVE_DUPLICATES Source_Files)
-
-if(USE_VULKAN)
-	file(GLOB SHADER_FILES ${ASSET_ROOT}/Shaders/VK/*.*)
-
-    list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.h)
-	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechRenderer.cpp)
-
-else()
-	list(REMOVE_ITEM Header_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechVulkanRenderer.h)
-	list(REMOVE_ITEM Source_Files ${CMAKE_CURRENT_SOURCE_DIR}/GameTechVulkanRenderer.cpp)
-endif()
-
 source_group("Source Files" FILES ${Source_Files})
+
+set(enet_Files
+    #"./enet/callbacks.h"
+    "./enet/callbacks.c"
+    "./enet/list.h"
+    "./enet/list.c"
+    "./enet/protocol.h"
+    "./enet/protocol.c"
+    "./enet/win32.h"
+    "./enet/win32.c"
+
+    "./enet/enet.h"
+    "./enet/time.h"
+    "./enet/types.h"
+    "./enet/utility.h"
+
+    "./enet/compress.c"
+    "./enet/host.c"
+    "./enet/packet.c"
+    "./enet/peer.c"
+)
+source_group("eNet" FILES ${enet_Files})
 
 set(ALL_FILES
     ${Header_Files}
     ${Source_Files}
+    ${AI_Behaviour_Tree}
+    ${AI_Pushdown_Automata}
+    ${AI_State_Machine}
+    ${AI_Pathfinding}
+    ${Collision_Detection}
+    ${Networking}
+    ${Physics}
+    ${enet_Files}   
 )
 
-if(USE_VULKAN)
-    set(ALL_FILES 
-        ${Header_Files}
-        ${Source_Files}
-        ${SHADER_FILES}
-    )
-
-foreach (file ${SHADER_FILES})
-    get_filename_component(file_name ${file} NAME)
-	get_filename_component(file_ext ${file} EXT)
-	
-	if(file_ext STREQUAL ".h" OR file_ext STREQUAL ".cpp")
-		continue()
-	endif()
-		
-	if( file_ext STREQUAL  ".vert" OR
-		file_ext STREQUAL  ".frag" OR
-		file_ext STREQUAL  ".comp" OR
-		file_ext STREQUAL  ".geom" OR
-		file_ext STREQUAL  ".tesc" OR
-		file_ext STREQUAL  ".tese" OR
-		file_ext STREQUAL  ".rgen" OR
-		file_ext STREQUAL  ".rint" OR
-		file_ext STREQUAL  ".rahit" OR
-		file_ext STREQUAL  ".rchit" OR
-		file_ext STREQUAL  ".rmiss" OR
-		file_ext STREQUAL  ".rcall" OR
-		file_ext STREQUAL  ".task" OR
-		file_ext STREQUAL  ".mesh"
-	)
-		message("Adding custom command to ${file}")
-		get_filename_component(file_dir ${file} ABSOLUTE)
-        set(SPIRV_OUTPUT ${file_name}.spv)
-		set(SPIRV_ABS_INPUT ${file_dir})
-		set(SPIRV_ABS_OUTPUT ${file_dir}.spv)
-		
-		add_custom_command(
-			OUTPUT ${SPIRV_ABS_OUTPUT}
-			
-			COMMENT "Compiling GLSL shader:"
-			COMMAND ${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE} -V  ${SPIRV_ABS_INPUT} -o ${SPIRV_ABS_OUTPUT}
-            DEPENDS ${file}
-			VERBATIM
-		)
-        list(APPEND SPIRV_BINARY_FILES ${SPIRV_OUTPUT})   
-	endif()
-endforeach()
-
-endif()
+set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)
 
 ################################################################################
 # Target
 ################################################################################
-add_executable(${PROJECT_NAME}  ${ALL_FILES})
+add_library(${PROJECT_NAME} STATIC ${ALL_FILES})
+
+#set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS c;C;M;c++;cc;cpp;cxx;m;mm;mpp;CPP;ixx;cppm)
 
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
-set(ROOT_NAMESPACE CSC8503)
+set(ROOT_NAMESPACE CSC8503CoreClasses)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VS_GLOBAL_KEYWORD "Win32Proj"
@@ -121,124 +156,52 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 set_target_properties(${PROJECT_NAME} PROPERTIES
     INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
 )
-
 ################################################################################
 # Compile definitions
 ################################################################################
-if(MSVC)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        "UNICODE;"
-        "_UNICODE" 
-        "WIN32_LEAN_AND_MEAN"
-        "_WINSOCKAPI_"   
-        "_WINSOCK2API_"
-        "_WINSOCK_DEPRECATED_NO_WARNINGS"
-    )
-endif()
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    "UNICODE"
+    "_UNICODE"
+    "WIN32_LEAN_AND_MEAN"
+    "_WINSOCK_DEPRECATED_NO_WARNINGS"
+	"NOMINMAX"
+)
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
     <vector>
     <map>
     <stack>
-    <list>   
-	<set>   
-	<string>
+    <string>
+    <list>
     <thread>
     <atomic>
     <functional>
     <iostream>
-	<chrono>
-	<sstream>
-	
-	"../NCLCoreClasses/Vector.h"
+    <set>
+    <chrono>
+    "../NCLCoreClasses/Vector.h"
     "../NCLCoreClasses/Quaternion.h"
     "../NCLCoreClasses/Plane.h"
     "../NCLCoreClasses/Matrix.h"
-    "../NCLCoreClasses/GameTimer.h"
+	"../NCLCoreClasses/GameTimer.h"
 )
- 
-if(USE_VULKAN)
-target_precompile_headers(${PROJECT_NAME} PRIVATE
-    <vulkan/vulkan.hpp>
-    <SmartTypes.h>
-    <VulkanRenderer.h>
-    #<VulkanShader.h>
-    #<VulkanShaderBuilder.h>
-    <VulkanTexture.h>
-    <VulkanMesh.h>
-    <VulkanPipelineBuilder.h>
-    <VulkanDynamicRenderBuilder.h>
-
-    <VulkanTextureBuilder.h>
-
-    <VulkanDescriptorSetLayoutBuilder.h>
-    <VulkanRenderPassBuilder.h>
-    #<VulkanCompute.h>
-    <VulkanComputePipelineBuilder.h>
-	<VulkanBufferBuilder.h>
-)
-endif()
 
 ################################################################################
 # Compile and link options
 ################################################################################
-if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:Release>:
-            /Oi;
-            /Gy
-        >
-        /permissive-;
-        /std:c++latest;
-        /sdl;
-        /W3;
-        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
-        ${DEFAULT_CXX_EXCEPTION_HANDLING};
-        /Y-
-    )
-    target_link_options(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:Release>:
-            /OPT:REF;
-            /OPT:ICF
-        >
-    )
-endif()
+
 
 ################################################################################
 # Dependencies
 ################################################################################
-if(MSVC)
-    target_link_libraries(${PROJECT_NAME} LINK_PUBLIC  "Winmm.lib")
-endif()
+set(ADDITIONAL_LIBRARY_DEPENDENCIES
+    "NCLCoreClasses"
+    "ws2_32.lib"
+)
 
 include_directories("../NCLCoreClasses/")
-include_directories("../CSC8503CoreClasses/")
+include_directories("./")
 
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC CSC8503CoreClasses)
-
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC GLTFLoader)
-
-if(USE_OPENGL)
-include_directories("../OpenGLRendering/")
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
-endif()
-
-if(USE_VULKAN)
-    include_directories("../VulkanRendering/")
-    target_link_libraries(${PROJECT_NAME} LINK_PUBLIC VulkanRendering)
-
-    add_compile_definitions(VULKAN_HPP_NO_STRUCT_CONSTRUCTORS)
-
-    add_compile_definitions(VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1)
-    add_compile_definitions(VULKAN_HPP_ENABLE_DYNAMIC_LOADER_TOOL=1)
-
-    add_compile_definitions(VK_NO_PROTOTYPES)
-
-    add_custom_target(
-        SHADER_FILES
-        DEPENDS ON ${SPIRV_BINARY_FILES}
-    )
-
-    add_dependencies(${PROJECT_NAME} SHADER_FILES)
+if(MSVC)
+    target_link_libraries(${PROJECT_NAME} PRIVATE "ws2_32.lib")
 endif()
