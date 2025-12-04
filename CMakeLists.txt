@@ -1,138 +1,78 @@
-set(PROJECT_NAME NCLCoreClasses)
+set(PROJECT_NAME OpenGLRendering)
 
 ################################################################################
 # Source groups
 ################################################################################
-set(Asset_Handling
-    "Assets.cpp"
-    "Assets.h"
-    "SimpleFont.cpp"
-    "SimpleFont.h"
-    "TextureLoader.cpp"
-    "TextureLoader.h"
-    "TextureWriter.cpp"
-    "TextureWriter.h"
-)
-source_group("Asset Handling" FILES ${Asset_Handling})
-
 set(Header_Files
-    "Camera.h"
+    "OGLTexture.h"
+    "OGLShader.h"
+    "OGLRenderer.h"
+    "OGLMesh.h"
+    "OGLComputeShader.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
-set(Maths
-    "Maths.cpp"
-    "Maths.h"
-
-    "Plane.cpp"
-    "Plane.h"
-	"Frustum.cpp"
-    "Frustum.h"
-    "Quaternion.cpp"
-    "Quaternion.h"
-
-	"Vector.h"
-    "Matrix.h"
-)
-source_group("Maths" FILES ${Maths})
-
-set(Rendering
-    "MeshAnimation.cpp"
-    "MeshAnimation.h"
-    "Mesh.cpp"
-    "Mesh.h"
-
-    "Buffer.h"
-	
-	"MshLoader.cpp"
-    "MshLoader.h"
-	
-    "MeshMaterial.cpp"
-    "MeshMaterial.h"
-    "RendererBase.cpp"
-    "RendererBase.h"
-    "Shader.cpp"
-    "Shader.h"
-    "Texture.cpp"
-    "Texture.h"
-)
-source_group("Rendering" FILES ${Rendering})
-
 set(Source_Files
-    "Camera.cpp"
+    "OGLTexture.cpp"
+    "OGLShader.cpp"
+    "OGLRenderer.cpp"
+    "OGLMesh.cpp"
+    "OGLComputeShader.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 
-set(Windowing_and_Input
-    "GameTimer.cpp"
-    "GameTimer.h"
-    "Keyboard.cpp"
-    "Keyboard.h"
-    "Mouse.cpp"
-    "Mouse.h"
-    "Window.cpp"
-    "Window.h"
-	"Controller.cpp"
-    "Controller.h"
-	"KeyboardMouseController.cpp"
-    "KeyboardMouseController.h"
+set(GLAD
+    "glad/gl.h"
+    "glad/gl.c"
 )
-source_group("Windowing and Input" FILES ${Windowing_and_Input})
-
-set(Windowing_and_Input__Win32
-    "Win32Keyboard.cpp"
-    "Win32Keyboard.h"
-    "Win32Mouse.cpp"
-    "Win32Mouse.h"
-    "Win32Window.cpp"
-    "Win32Window.h"
-)
-source_group("Windowing and Input\\Win32" FILES ${Windowing_and_Input__Win32})
+source_group("GLAD" FILES ${GLAD})
 
 set(ALL_FILES
-    ${Asset_Handling}
     ${Header_Files}
-    ${Maths}
-    ${Rendering}
     ${Source_Files}
-    ${Windowing_and_Input}
-    ${Windowing_and_Input__Win32}
+    ${GLAD}
 )
 
+set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)
+ 
 ################################################################################
 # Target
 ################################################################################
 add_library(${PROJECT_NAME} STATIC ${ALL_FILES})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
-)
+#use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
+
+set(ROOT_NAMESPACE OpenGLRendering)
+
 target_precompile_headers(${PROJECT_NAME} PRIVATE
+    <chrono>
     <memory>
     <unordered_set>
     <vector>
     <string>
     <fstream>
-    <sstream>
     <iostream>
     <string>
     <iosfwd>
     <set>
-    <map> 
-    <chrono>
-    <thread>
-    <filesystem>
+	<assert.h>
     <functional>
-	<algorithm>
-	<assert.h>  
+
+    <Vector.h>
+    <Matrix.h>
+    <Quaternion.h>
 )
 
+target_include_directories (${PROJECT_NAME} 
+    PUBLIC ${CMAKE_SOURCE_DIR}/NCLCoreClasses
+    PUBLIC ${CMAKE_SOURCE_DIR}/OpenGLRendering
+)	
 ################################################################################
-# Compile and link options
+# Dependencies
 ################################################################################
-if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE
-        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
-        ${DEFAULT_CXX_EXCEPTION_HANDLING};
-    )
-endif()
+set(ADDITIONAL_LIBRARY_DEPENDENCIES
+    "NCLCoreClasses"
+    "opengl32.lib"
+)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
